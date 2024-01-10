@@ -1,0 +1,19 @@
+name: 🎫 Feature request
+description: Suggest a new feature for this sample application.
+title: "[FEATURE] "
+labels: ["new-feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request new features.
+        
+        > [!IMPORTANT]
+        > These requests will be reviewed and prioritized.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Provide some context here on the functionality you would like to see in this sample application.
+    validations:
+      required: true

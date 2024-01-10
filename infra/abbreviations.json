@@ -1,0 +1,12 @@
+{
+  "applicationInsights": "app-insights",
+  "applicationInsightsDashboard": "app-dashboard",
+  "containerRegistry": "containerreg",
+  "containerAppsApp": "container-app",
+  "containerAppsEnv": "container-env",
+  "cosmosDbAccount": "cosmos-db-nosql",
+  "openAiAccount": "openai",
+  "logAnalyticsWorkspace": "log-analytics",
+  "storageAccount": "storage",
+  "userAssignedIdentity": "ua-id"
+}

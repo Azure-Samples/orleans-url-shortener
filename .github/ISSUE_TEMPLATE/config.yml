@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Microsoft Q&A
+    url: https://learn.microsoft.com/answers/tags/187/azure-cosmos-db
+    about: Please ask and answer questions about Azure Cosmos DB.

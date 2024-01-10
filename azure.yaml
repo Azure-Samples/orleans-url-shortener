@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: orleans-cosmos-db-url-shortener
+services:
+  web:
+    project: ./src/web
+    language: csharp
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: ../
