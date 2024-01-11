@@ -31,15 +31,17 @@ var abbreviations = loadJsonContent('abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = {
   'azd-env-name': environmentName
-  repo: 'https://github.com/azure-samples/cosmos-db-nosql-dotnet-quickstart'
+  repo: 'https://github.com/azure-samples/orleans-url-shortener'
 }
 
+// Define resource group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: environmentName
   location: location
   tags: tags
 }
 
+// Optionally create Azure Cosmos DB for NoSQL account and resources
 module database 'app/database.bicep' = if (deployAzureCosmosDBNoSQL) {
   name: 'database'
   scope: resourceGroup
@@ -50,6 +52,7 @@ module database 'app/database.bicep' = if (deployAzureCosmosDBNoSQL) {
   }
 }
 
+// Optionally create Azure Table Storage account and resources
 module storage 'app/storage.bicep' = if (deployAzureTableStorage) {
   name: 'storage'
   scope: resourceGroup
@@ -60,6 +63,7 @@ module storage 'app/storage.bicep' = if (deployAzureTableStorage) {
   }
 }
 
+// Create Azure Container Registry resource
 module registry 'app/registry.bicep' = {
   name: 'registry'
   scope: resourceGroup
@@ -70,34 +74,7 @@ module registry 'app/registry.bicep' = {
   }
 }
 
-module databaseSecurity 'app/security-database.bicep' = if (deployAzureCosmosDBNoSQL) {
-  name: 'database-security'
-  scope: resourceGroup
-  params: {
-    databaseAccountName: database.outputs.accountName
-    appPrincipalId: web.outputs.managedIdentityPrincipalId
-    userPrincipalId: !empty(principalId) ? principalId : null
-  }
-}
-
-module storageSecurity 'app/security-storage.bicep' = if (deployAzureTableStorage) {
-  name: 'storage-security'
-  scope: resourceGroup
-  params: {
-    appPrincipalId: web.outputs.managedIdentityPrincipalId
-    userPrincipalId: !empty(principalId) ? principalId : null
-  }
-}
-
-module registrySecurity 'app/security-registry.bicep' = {
-  name: 'registry-security'
-  scope: resourceGroup
-  params: {
-    appPrincipalId: web.outputs.managedIdentityPrincipalId
-    userPrincipalId: !empty(principalId) ? principalId : null
-  }
-}
-
+// Create Azure Log Analytics workspace
 module monitoring 'app/monitoring.bicep' = {
   name: 'monitoring'
   scope: resourceGroup
@@ -108,6 +85,7 @@ module monitoring 'app/monitoring.bicep' = {
   }
 }
 
+// Create Azure Container App and environment
 module web 'app/web.bicep' = {
   name: serviceName
   scope: resourceGroup
@@ -119,6 +97,55 @@ module web 'app/web.bicep' = {
     databaseAccountEndpoint: deployAzureCosmosDBNoSQL ? database.outputs.endpoint : null
     storageAccountEndpoint: deployAzureTableStorage ? storage.outputs.endpoint : null
     logAnalyticsWorkspaceName: monitoring.outputs.logAnalyticsWorkspaceName
+    serviceTag: serviceName
+  }
+}
+
+// Optinally create RBAC definitions and assign roles for Azure Cosmos DB for NoSQL
+module databaseSecurity 'app/security-database.bicep' = if (deployAzureCosmosDBNoSQL) {
+  name: 'database-security'
+  scope: resourceGroup
+  params: {
+    databaseAccountName: deployAzureCosmosDBNoSQL ? database.outputs.accountName : ''
+    appPrincipalId: web.outputs.managedIdentityPrincipalId
+    userPrincipalId: !empty(principalId) ? principalId : null
+  }
+}
+
+// Optionally assign RBAC roles for Azure Table Storage
+module storageSecurity 'app/security-storage.bicep' = if (deployAzureTableStorage) {
+  name: 'storage-security'
+  scope: resourceGroup
+  params: {
+    appPrincipalId: web.outputs.managedIdentityPrincipalId
+    userPrincipalId: !empty(principalId) ? principalId : null
+  }
+}
+
+// Assign RBAC roles for Azure Container Registry
+module registrySecurity 'app/security-registry.bicep' = {
+  name: 'registry-security'
+  scope: resourceGroup
+  params: {
+    appPrincipalId: web.outputs.managedIdentityPrincipalId
+    userPrincipalId: !empty(principalId) ? principalId : null
+  }
+}
+
+// Assign Azure Container Registry to Azure Container App
+module webSecurity 'app/security-web.bicep' = {
+  name: 'web-security'
+  scope: resourceGroup
+  dependsOn: [
+    registrySecurity
+  ]
+  params: {
+    envName: !empty(containerAppsEnvName) ? containerAppsEnvName : '${abbreviations.containerAppsEnv}-${resourceToken}'
+    appName: !empty(containerAppsAppName) ? containerAppsAppName : '${abbreviations.containerAppsApp}-${resourceToken}'
+    location: location
+    tags: tags
+    databaseAccountEndpoint: deployAzureCosmosDBNoSQL ? database.outputs.endpoint : null
+    storageAccountEndpoint: deployAzureTableStorage ? storage.outputs.endpoint : null
     containerRegistryEndpoint: registry.outputs.endpoint
     serviceTag: serviceName
   }
