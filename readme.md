@@ -1,6 +1,29 @@
+---
+page_type: sample
+languages:
+- azdeveloper
+- aspx-csharp
+- csharp
+- bicep
+products:
+- azure
+- azure-cosmos-db
+- azure-container-apps
+- azure-table-storage
+- azure-storage
+- azure-container-registry
+- aspnet-core
+urlFragment: template
+name: URL Shortener using Microsoft Orleans and Azure for hosting and data
+description: An ASP.NET Core 8.0 web application to illustrate basic Microsoft Orleans concepts; such as working with Grains, Silos, and persistent state. Uses Azure Developer CLI (azd) to build, deploy, and monitor.
+---
+<!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
+
 # URL Shortener using Microsoft Orleans and Azure for hosting and data
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Azure-Samples/orleans-url-shortener?quickstart=1)
+[![Microsoft Learn Quickstart](https://img.shields.io/static/v1?style=for-the-badge&label=Microsoft%20Learn%20Quickstart&message=Go&color=purple&logo=microsoft)](https://learn.microsoft.com/dotnet/orleans/quickstarts/deploy-scale-orleans-on-azure)
+[![Open in GitHub Codespaces](https://img.shields.io/static/v1?style=for-the-badge&label=GitHub+Codespaces&message=Open&color=brightgreen&logo=github)](https://codespaces.new/Azure-Samples/orleans-url-shortener?quickstart=1)
+[![Open in Dev Container](https://img.shields.io/static/v1?style=for-the-badge&label=Dev+Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/orleans-url-shortener)
 
 This is an ASP.NET Core 8.0 web application to illustrate basic Microsoft Orleans concepts; such as working with Grains, Silos, and persistent state. This web application can be configured to work with [in-memory](https://learn.microsoft.com/dotnet/api/orleans.hosting.memorygrainstoragesilobuilderextensions.addmemorygrainstorage), [Azure Cosmos DB for NoSQL](https://learn.microsoft.com/dotnet/orleans/grains/grain-persistence/azure-cosmos-db), or [Azure Table Storage](https://learn.microsoft.com/dotnet/orleans/grains/grain-persistence/azure-storage) data persistence options. The web application is designed to be hosted using a Docker container in [Azure Contianer Apps](https://learn.microsoft.com/azure/container-apps/).
 
