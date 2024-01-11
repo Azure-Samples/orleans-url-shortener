@@ -6,8 +6,6 @@ param tags object = {}
 
 var database = {
   name: 'Orleans' // Default database
-  autoscale: true // Scale at the database level
-  throughput: 1000 // Enable autoscale with a minimum of 100 RUs and a maximum of 1,000 RUs
 }
 
 var containers = [
@@ -16,12 +14,18 @@ var containers = [
     partitionKeyPaths: [
       '/ClusterId' // Partition key
     ]
+    autoscale: true // Scale at the database level
+    throughput: 1000 // Enable autoscale with a minimum of 100 RUs and a maximum of 1,000 RUs
+
   }
   {
     name: 'OrleansStorage' // Default storage container
     partitionKeyPaths: [
       '/PartitionKey' // Partition key
     ]
+    autoscale: true // Scale at the database level
+    throughput: 1000 // Enable autoscale with a minimum of 100 RUs and a maximum of 1,000 RUs
+
   }
 ]
 
@@ -41,9 +45,6 @@ module cosmosDbDatabase '../core/database/cosmos-db/nosql/database.bicep' = {
     name: database.name
     parentAccountName: cosmosDbAccount.outputs.name
     tags: tags
-    setThroughput: true
-    autoscale: database.autoscale
-    throughput: database.throughput
   }
 }
 
@@ -54,7 +55,9 @@ module cosmosDbContainers '../core/database/cosmos-db/nosql/container.bicep' = [
     parentAccountName: cosmosDbAccount.outputs.name
     parentDatabaseName: cosmosDbDatabase.outputs.name
     tags: tags
-    setThroughput: false
+    setThroughput: true
+    autoscale: container.autoscale
+    throughput: container.throughput
     partitionKeyPaths: container.partitionKeyPaths
   }
 }]

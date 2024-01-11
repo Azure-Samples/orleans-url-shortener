@@ -56,13 +56,20 @@ param ingressEnabled bool = true
 @description('Allowed CORS origins.')
 param allowedOrigins string[] = []
 
+type registry = {
+  server: string
+  identity: string?
+  username: string?
+  passwordSecretRef: string?
+}
+
 @description('List of registries. Defaults to an empty list.')
-param registries string[] = []
+param registries registry[] = []
 
 @description('Enable system-assigned managed identity. Defaults to false.')
 param enableSystemAssignedManagedIdentity bool = false
 
-@description('List of user-assigned managed identities. Defaults to an empty array.')
+@description('List of user-assigned managed identities. Defaults to an empty list.')
 param userAssignedManagedIdentityIds string[] = []
 
 resource environment 'Microsoft.App/managedEnvironments@2023-05-01' existing = {
@@ -89,10 +96,7 @@ resource app 'Microsoft.App/containerApps@2023-05-01' = {
         }
       } : null
       secrets: secrets
-      registries: [for (registry, _) in registries: {
-        server: registry
-        identity: enableSystemAssignedManagedIdentity ? 'system' : !empty(userAssignedManagedIdentityIds) ? userAssignedManagedIdentityIds[0] : null
-      }]
+      registries: !empty(registries) ? registries : null
     }
     template: {
       containers: [

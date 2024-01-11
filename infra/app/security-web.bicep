@@ -1,4 +1,4 @@
-metadata description = 'Create web application resources.'
+metadata description = 'Assigns web application registry.'
 
 param envName string
 param appName string
@@ -6,14 +6,14 @@ param serviceTag string
 param location string = resourceGroup().location
 param tags object = {}
 
-@description('Name of the Log Analytics workspace to use.')
-param logAnalyticsWorkspaceName string
-
 @description('Endpoint for Azure Cosmos DB for NoSQL account.')
 param databaseAccountEndpoint string = ''
 
 @description('Endpoint for Azure Table Storage account.')
 param storageAccountEndpoint string = ''
+
+@description('Endpoint of the Azure Container Registry to use.')
+param containerRegistryEndpoint string = ''
 
 var secrets = union(
   [],
@@ -47,21 +47,16 @@ var environmentVariables = union(
   ]
 )
 
-module containerAppsEnvironment '../core/host/container-apps/environments/managed.bicep' = {
-  name: 'container-apps-env'
-  params: {
-    name: envName
-    location: location
-    tags: tags
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
-  }
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' existing = {
+  name: envName
 }
 
+// The registries must be assigned AFTER the web app's system-assigned managed identity is granted access to the container registry
 module containerAppsApp '../core/host/container-apps/app.bicep' = {
   name: 'container-apps-app'
   params: {
     name: appName
-    parentEnvironmentName: containerAppsEnvironment.outputs.name
+    parentEnvironmentName: containerAppsEnvironment.name
     location: location
     tags: union(tags, {
         'azd-service-name': serviceTag
@@ -70,10 +65,10 @@ module containerAppsApp '../core/host/container-apps/app.bicep' = {
     environmentVariables: environmentVariables
     targetPort: 8080
     enableSystemAssignedManagedIdentity: true
+    registries: [ {
+        server: containerRegistryEndpoint
+        identity: 'system'
+      } ]
     containerImage: 'mcr.microsoft.com/dotnet/samples:aspnetapp'
   }
 }
-
-output endpoint string = containerAppsApp.outputs.endpoint
-output envName string = containerAppsApp.outputs.name
-output managedIdentityPrincipalId string = containerAppsApp.outputs.systemAssignedManagedIdentityPrincipalId

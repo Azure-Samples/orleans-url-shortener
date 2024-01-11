@@ -150,7 +150,7 @@ Azure data persistence is **opt-in** for this template. By default, the template
         {
             builder.Host.UseOrleans(siloBuilder =>
             {
-                var endpoint = new Uri(builder.Configuration["AZURE_COSMOS_DB_NOSQL_ENDPOINT"]!);
+                var endpoint = new Uri(builder.Configuration["AZURE_TABLE_STORAGE_ENDPOINT"]!);
                 var credential = new DefaultAzureCredential();
 
                 siloBuilder
@@ -175,7 +175,7 @@ Azure data persistence is **opt-in** for this template. By default, the template
 
     ```bash
     # Rebuild Docker container and re-deploy application to Azure Container Apps
-    azd up
+    azd deploy
     ```
     
 ### Application Architecture
