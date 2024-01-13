@@ -74,6 +74,12 @@ Azure data persistence is **opt-in** for this template. By default, the template
     azd provision
     ```
 
+1. Change your current working directory to `./src/web`
+
+    ```bash
+    cd ./src/web
+    ```
+
 1. Add the correct package for the data persistence and clustering option you prefer.
 
     - **Azure Cosmos DB for NoSQL persistence**
